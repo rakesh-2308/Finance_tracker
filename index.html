@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Finance Tracker</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f9f9f9;
+      color: #333;
+    }
+    header {
+      background-color: #2c3e50;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    nav {
+      background-color: #34495e;
+      overflow: hidden;
+    }
+    nav a {
+      float: left;
+      display: block;
+      color: white;
+      text-align: center;
+      padding: 14px 20px;
+      text-decoration: none;
+    }
+    nav a:hover {
+      background-color: #2980b9;
+    }
+    .container {
+      padding: 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    table th, table td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+    table th {
+      background-color: #2c3e50;
+      color: white;
+    }
+    form label, form input, form button {
+      display: block;
+      margin: 10px 0;
+    }
+    form input {
+      padding: 10px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    form button {
+      padding: 10px;
+      background-color: #27ae60;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    form button:hover {
+      background-color: #2ecc71;
+    }
+    footer {
+      background-color: #34495e;
+      color: white;
+      text-align: center;
+      padding: 10px 0;
+      position: relative;
+      bottom: 0;
+      width: 100%;
+    }
+    .total-balance {
+      margin-top: 20px;
+      font-size: 1.2em;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Finance Tracker</h1>
+  </header>
+
+  <nav>
+    <a href="#dashboard">Dashboard</a>
+    <a href="#add-transaction">Add Transaction</a>
+  </nav>
+
+  <div class="container">
+    <section id="dashboard">
+      <h2>Transaction History</h2>
+      <table id="transactionsTable">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Description</th>
+            <th>Type</th>
+            <th>Amount</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Transactions will be dynamically added here -->
+        </tbody>
+      </table>
+
+      <div class="total-balance" id="totalBalance">
+        Total Balance: $0.00
+      </div>
+    </section>
+
+    <section id="add-transaction" class="section">
+      <h2>Add New Transaction</h2>
+      <form id="transactionForm">
+        <label for="date">Date:</label>
+        <input type="date" id="date" name="date" required>
+
+        <label for="description">Description:</label>
+        <input type="text" id="description" name="description" placeholder="Enter description" required>
+
+        <label for="type">Type:</label>
+        <select id="type" name="type" required>
+          <option value="income">Income</option>
+          <option value="expense">Expense</option>
+        </select>
+
+        <label for="amount">Amount ($):</label>
+        <input type="number" id="amount" name="amount" step="0.01" placeholder="Enter amount" required>
+
+        <button type="submit">Add Transaction</button>
+      </form>
+    </section>
+  </div>
+
+  <footer>
+    <p>&copy; 2023 Finance Tracker. All rights reserved.</p>
+  </footer>
+
+  <script>
+    // JavaScript for managing transactions
+    let transactions = [];
+    const transactionsTableBody = document.querySelector('#transactionsTable tbody');
+    const totalBalanceElement = document.getElementById('totalBalance');
+
+    function updateTotalBalance() {
+      const totalBalance = transactions.reduce((sum, transaction) => {
+        return sum + (transaction.type === 'income' ? transaction.amount : -transaction.amount);
+      }, 0);
+      totalBalanceElement.textContent = `Total Balance: $${totalBalance.toFixed(2)}`;
+    }
+
+    function renderTransactions() {
+      transactionsTableBody.innerHTML = '';
+      transactions.forEach((transaction, index) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${transaction.date}</td>
+          <td>${transaction.description}</td>
+          <td>${transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1)}</td>
+          <td>$${transaction.amount.toFixed(2)}</td>
+          <td><button onclick="deleteTransaction(${index})">Delete</button></td>
+        `;
+        transactionsTableBody.appendChild(row);
+      });
+      updateTotalBalance();
+    }
+
+    function addTransaction(event) {
+      event.preventDefault();
+      const date = document.getElementById('date').value;
+      const description = document.getElementById('description').value;
+      const type = document.getElementById('type').value;
+      const amount = parseFloat(document.getElementById('amount').value);
+
+      if (date && description && amount) {
+        transactions.push({ date, description, type, amount });
+        renderTransactions();
+        document.getElementById('transactionForm').reset();
+      } else {
+        alert('Please fill out all fields.');
+      }
+    }
+
+    function deleteTransaction(index) {
+      transactions.splice(index, 1);
+      renderTransactions();
+    }
+
+    document.getElementById('transactionForm').addEventListener('submit', addTransaction);
+
+    // Initial render
+    renderTransactions();
+  </script>
+</body>
+</html>
